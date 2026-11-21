@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kinetic Caption Studio — Created by Ren</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Bangers&family=Rubik:wght@900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #181b22;
+      --card: #1e232d;
+      --border: #2a2f3d;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent-hover: #16a34a;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 14px 22px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+    header span { color: var(--accent); }
+    .creator-badge {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .creator-badge strong {
+      color: var(--text);
+    }
+
+    /* Start Menu */
+    .menu-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 18px;
+      gap: 22px;
+    }
+    .menu-title { text-align: center; max-width: 640px; }
+    .menu-title h2 { margin: 0 0 8px; font-size: 1.75rem; }
+    .menu-title p { margin: 0; color: var(--muted); font-size: 0.96rem; line-height: 1.5; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 840px;
+    }
+    .mode-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .mode-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+    .mode-icon { font-size: 1.6rem; }
+    .mode-card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+    .mode-card p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+    .mode-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .menu-tip {
+      width: 100%;
+      max-width: 840px;
+      background: #141820;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .menu-tip strong {
+      color: var(--text);
+    }
+
+    /* Studio Workspace */
+    .studio {
+      display: none;
+      grid-template-columns: 370px 1fr;
+      gap: 18px;
+      padding: 18px;
+      flex: 1;
+    }
+    .studio.active { display: grid; }
+    @media (max-width: 920px) {
+      .studio.active { grid-template-columns: 1fr; }
+    }
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mode-section { display: none; flex-direction: column; gap: 10px; }
+    .mode-section.active { display: flex; }
+
+    .wave-box {
+      background: #0d1016;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .wave-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #1f2430;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+    .live-pill.active {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6b7280;
+    }
+    .live-pill.active .dot {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+    }
+    #waveCanvas {
+      width: 100%;
+      height: 56px;
+      border-radius: 6px;
+      background: #090b0f;
+      display: block;
+    }
+    .group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 0.74rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    select, textarea, input[type="number"], input[type="range"], input[type="file"] {
+      background: #0f1115;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    input[type="color"] {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0f1115;
+      cursor: pointer;
+    }
+    button {
+      background: #262b38;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 13px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    button:hover { background: #32394a; }
+    button.primary {
+      background: var(--accent);
+      color: #052e16;
+      border: none;
+    }
+    button.primary:hover { background: var(--accent-hover); }
+    button.recording {
+      background: var(--danger);
+      color: #ffffff;
+      border: none;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .preview-area {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+    #canvas {
+      background: #00b140;
+      border-radius: 10px;
+      max-width: 100%;
+      max-height: 56vh;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+    }
+    .transport {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .status { font-size: 0.85rem; color: var(--muted); text-align: center; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span>MRBEAST</span> KINETIC CAPTION STUDIO</h1>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div class="creator-badge">Created by <strong>Ren</strong></div>
+    <button id="backMenuBtn" type="button" style="display:none;">← Choose Mode</button>
+  </div>
+</header>
+
+<!-- START MENU -->
+<div id="startMenu" class="menu-wrap">
+  <div class="menu-title">
+    <h2>How do you want to create your captions?</h2>
+    <p>Created by <strong>Ren</strong> to give users and new content creators free, high-quality assets for their videos. Pick a mode below to get started.</p>
+  </div>
+
+  <div class="menu-grid">
+    <div class="mode-card" data-mode="mic">
+      <div>
+        <div class="mode-icon">🎙️</div>
+        <h3>Live Mic &amp; Voice Sync</h3>
+        <p>Talk into your mic with live audio waves, auto-stop when you finish speaking, auto-play the synced preview, and download video + audio.</p>
+      </div>
+      <div class="mode-tag">Record Voice + Auto-Play</div>
+    </div>
+
+    <div class="mode-card" data-mode="upload">
+      <div>
+        <div class="mode-icon">📁</div>
+        <h3>Upload MP3 / MP4 Audio</h3>
+        <p>Load an existing audio or video file, type or paste the words, auto-play synced captions, and export the video with sound.</p>
+      </div>
+      <div class="mode-tag">File Audio + Video</div>
+    </div>
+
+    <div class="mode-card" data-mode="text">
+      <div>
+        <div class="mode-icon">⌨️</div>
+        <h3>Text-Only Test</h3>
+        <p>Type any words to preview pacing, colors, fonts, and pop animations with no audio required.</p>
+      </div>
+      <div class="mode-tag">Quick Text Test</div>
+    </div>
+  </div>
+
+  <div class="menu-tip">
+    <strong>How Sync Works:</strong> Live speech recognition can arrive slightly late while talking, so replay and export analyze the <strong>actual voice loudness waveform</strong> of your recording to find where active voice happens and pace words across those active speech windows rather than rushing through silence.
+  </div>
+</div>
+
+<!-- STUDIO WORKSPACE -->
+<div id="studio" class="studio">
+  <div class="controls">
+    <!-- Mode 1: Live Mic -->
+    <div id="section-mic" class="mode-section">
+      <button id="micBtn" class="primary" type="button">🎙️ Start Talking</button>
+      <div class="wave-box">
+        <div class="wave-header">
+          <span>LIVE VOICE WAVEFORM</span>
+          <span id="livePill" class="live-pill"><span class="dot"></span>IDLE</span>
+        </div>
+        <canvas id="waveCanvas" width="330" height="56"></canvas>
+      </div>
+      <div class="group">
+        <label>Auto-Stop After Silence: <span id="silenceLabel">2.5s</span></label>
+        <input type="range" id="silenceSlider" min="1.0" max="5.0" step="0.5" value="2.5" />
+      </div>
+    </div>
+
+    <!-- Mode 2: Upload Audio -->
+    <div id="section-upload" class="mode-section">
+      <div class="group">
+        <label>Upload MP3 or MP4 File</label>
+        <input type="file" id="fileInput" accept="audio/*,video/*" />
+      </div>
+      <button id="syncUploadBtn" type="button">⚡ Re-Sync &amp; Auto-Play</button>
+    </div>
+
+    <!-- Mode 3: Text-Only Speed -->
+    <div id="section-text" class="mode-section">
+      <div class="group">
+        <label>Animation Speed: <span id="speedLabel">3.2 words/sec</span></label>
+        <input type="range" id="speedSlider" min="1.0" max="7.0" step="0.2" value="3.2" />
+      </div>
+    </div>
+
+    <!-- Shared Words Box -->
+    <div class="group">
+      <label>Words / Script</label>
+      <textarea id="wordsBox" placeholder="Speak into mic, upload audio, or type words here...">THIS CHROMEBOOK IS ACTUALLY EVIL AND WE ARE SELLING IT TODAY</textarea>
+    </div>
+
+    <div class="row">
+      <div class="group">
+        <label>Words Per Group</label>
+        <select id="groupSize">
+          <option value="1">1 Word</option>
+          <option value="2" selected>2 Words</option>
+          <option value="3">3 Words</option>
+        </select>
+      </div>
+      <div class="group">
+        <label>Font</label>
+        <select id="fontSelect">
+          <option value="Montserrat">Montserrat Black</option>
+          <option value="Bangers">Bangers</option>
+          <option value="Rubik">Rubik Black</option>
+          <option value="Impact">Impact</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="group">
+        <label>Active Word Color</label>
+        <input type="color" id="activeColor" value="#22ff44" />
+      </div>
+      <div class="group">
+        <label>Background</label>
+        <input type="color" id="bgColor" value="#00b140" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="group">
+        <label>Font Size (px)</label>
+        <input type="number" id="fontSize" value="96" min="40" max="180" />
+      </div>
+      <div class="group">
+        <label>Outline (px)</label>
+        <input type="number" id="strokeWidth" value="16" min="4" max="32" />
+      </div>
+    </div>
+
+    <div class="group">
+      <label>Aspect Ratio</label>
+      <select id="aspectSelect">
+        <option value="1920x1080" selected>16:9 Horizontal</option>
+        <option value="1080x1920">9:16 Vertical</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="preview-area">
+    <canvas id="canvas" width="1920" height="1080"></canvas>
+    <audio id="audioEl" controls style="width: 100%; max-width: 720px;"></audio>
+    <div class="transport">
+      <button id="stopBtn" type="button">⏹️ Stop Preview</button>
+      <button id="exportBtn" class="primary" type="button">⬇️ Download Video + Audio</button>
+    </div>
+    <div class="status" id="statusText">Ready.</div>
+  </div>
+</div>
+
+<script>
+  // REVERT BACK STAGE 1 SNAPSHOT (v9 waveform-synced baseline before voice-gated intro)
+  const REVERT_STAGE_1_SNAPSHOT = {
+    version: 'v9-baseline',
+    note: 'Save point before gating intro words until voice energy starts in live mic and playback.'
+  };
+
+  const startMenu = document.getElementById('startMenu');
+  const studio = document.getElementById('studio');
+  const backMenuBtn = document.getElementById('backMenuBtn');
+
+  const sectionMic = document.getElementById('section-mic');
+  const sectionUpload = document.getElementById('section-upload');
+  const sectionText = document.getElementById('section-text');
+
+  const micBtn = document.getElementById('micBtn');
+  const livePill = document.getElementById('livePill');
+  const waveCanvas = document.getElementById('waveCanvas');
+  const waveCtx = waveCanvas.getContext('2d');
+  const silenceSlider = document.getElementById('silenceSlider');
+  const silenceLabel = document.getElementById('silenceLabel');
+
+  const fileInput = document.getElementById('fileInput');
+  const syncUploadBtn = document.getElementById('syncUploadBtn');
+  const speedSlider = document.getElementById('speedSlider');
+  const speedLabel = document.getElementById('speedLabel');
+
+  const wordsBox = document.getElementById('wordsBox');
+  const groupSizeSelect = document.getElementById('groupSize');
+  const fontSelect = document.getElementById('fontSelect');
+  const activeColor = document.getElementById('activeColor');
+  const bgColor = document.getElementById('bgColor');
+  const fontSizeInput = document.getElementById('fontSize');
+  const strokeWidthInput = document.getElementById('strokeWidth');
+  const aspectSelect = document.getElementById('aspectSelect');
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const audioEl = document.getElementById('audioEl');
+  const statusText = document.getElementById('statusText');
+
+  let currentMode = 'mic';
+  let isRecording = false;
+
+  let persistentMicStream = null;
+  let micMediaRecorder = null;
+  let micChunks = [];
+  let autoPlayOnRecordStop = false;
+
+  let audioObjectUrl = null;
+  let recognition = null;
+
+  let sharedAudioCtx = null;
+  let decodedAudioBuffer = null;
+  let activeBufferSource = null;
+  let suppressAudioPlayEvent = false;
+
+  let analyser = null;
+  let timeData = null;
+  let waveAnimId = null;
+
+  let sessionStartMs = 0;
+  let hasSpokenOnce = false;
+  let lastSpeechMs = 0;
+  let audioDurationSec = 0;
+
+  let syncedWords = [];
+  let finalizedText = '';
+  let currentInterimWords = [];
+  let liveAnimId = null;
+  let playbackAnimId = null;
+  let isPlaying = false;
+
+  // Speech recognition lag compensation in seconds (~180ms)
+  const STT_LAG_COMP_SEC = 0.18;
+
+  async function ensureAudioCtx() {
+    if (!sharedAudioCtx) {
+      sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (sharedAudioCtx.state === 'suspended') {
+      await sharedAudioCtx.resume();
+    }
+    return sharedAudioCtx;
+  }
+
+  async function ensurePersistentMic() {
+    const actx = await ensureAudioCtx();
+    if (!persistentMicStream || persistentMicStream.getTracks().every(t => t.readyState === 'ended')) {
+      persistentMicStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true }
+      });
+      const source = actx.createMediaStreamSource(persistentMicStream);
+      analyser = actx.createAnalyser();
+      analyser.fftSize = 512;
+      timeData = new Uint8Array(analyser.fftSize);
+      source.connect(analyser);
+    }
+    return persistentMicStream;
+  }
+
+  async function processRecordedOrUploadedBlob(blobOrFile, shouldAutoPlay = false) {
+    if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+    audioObjectUrl = URL.createObjectURL(blobOrFile);
+
+    suppressAudioPlayEvent = true;
+    audioEl.pause();
+    audioEl.src = audioObjectUrl;
+    audioEl.load();
+    setTimeout(() => { suppressAudioPlayEvent = false; }, 100);
+
+    try {
+      const actx = await ensureAudioCtx();
+      const arrBuf = await blobOrFile.arrayBuffer();
+      decodedAudioBuffer = await actx.decodeAudioData(arrBuf.slice(0));
+      audioDurationSec = decodedAudioBuffer.duration;
+      buildWaveformSyncedTimeline();
+      statusText.textContent = `Synced to voice waveform (${audioDurationSec.toFixed(1)}s).`;
+    } catch (err) {
+      console.warn('decodeAudioData fallback:', err);
+      decodedAudioBuffer = null;
+      buildWaveformSyncedTimeline();
+      statusText.textContent = 'Audio loaded.';
+    }
+
+    if (shouldAutoPlay) {
+      await playSynced({ autoTriggered: true });
+    }
+  }
+
+  document.querySelectorAll('.mode-card').forEach(card => {
+    card.addEventListener('click', async () => {
+      await ensureAudioCtx();
+      currentMode = card.dataset.mode;
+      startMenu.style.display = 'none';
+      studio.classList.add('active');
+      backMenuBtn.style.display = 'inline-block';
+
+      sectionMic.classList.toggle('active', currentMode === 'mic');
+      sectionUpload.classList.toggle('active', currentMode === 'upload');
+      sectionText.classList.toggle('active', currentMode === 'text');
+
+      if (currentMode === 'mic') {
+        wordsBox.value = '';
+        syncedWords = [];
+        decodedAudioBuffer = null;
+        audioDurationSec = 0;
+        hasSpokenOnce = false;
+        audioEl.removeAttribute('src');
+        statusText.textContent = 'Click "Start Talking" — words stay hidden until you start speaking.';
+      } else if (currentMode === 'upload') {
+        statusText.textContent = 'Upload an MP3 or MP4 file to auto-play synced captions.';
+      } else {
+        buildWaveformSyncedTimeline();
+        await playSynced({ autoTriggered: true });
+      }
+      drawCaptionGroup([], -1, null);
+    });
+  });
+
+  backMenuBtn.addEventListener('click', () => {
+    if (isRecording) stopLiveMic('Stopped recording.', false);
+    stopPlayback();
+    studio.classList.remove('active');
+    backMenuBtn.style.display = 'none';
+    startMenu.style.display = 'flex';
+  });
+
+  silenceSlider.addEventListener('input', () => {
+    silenceLabel.textContent = `${parseFloat(silenceSlider.value).toFixed(1)}s`;
+  });
+
+  speedSlider.addEventListener('input', async () => {
+    speedLabel.textContent = `${parseFloat(speedSlider.value).toFixed(1)} words/sec`;
+    if (!isRecording && currentMode === 'text') {
+      buildWaveformSyncedTimeline();
+      await playSynced({ autoTriggered: true });
+    }
+  });
+
+  function drawIdleWave() {
+    const w = waveCanvas.width;
+    const h = waveCanvas.height;
+    waveCtx.fillStyle = '#090b0f';
+    waveCtx.fillRect(0, 0, w, h);
+
+    const bars = 36;
+    const gap = 3;
+    const barW = (w - gap * (bars - 1)) / bars;
+    for (let i = 0; i < bars; i++) {
+      const x = i * (barW + gap);
+      waveCtx.fillStyle = '#272c3a';
+      waveCtx.fillRect(x, (h - 4) / 2, barW, 4);
+    }
+  }
+
+  function renderWaveformAndSilence() {
+    if (!isRecording || !analyser || !timeData) return;
+
+    analyser.getByteTimeDomainData(timeData);
+
+    const w = waveCanvas.width;
+    const h = waveCanvas.height;
+    waveCtx.fillStyle = '#090b0f';
+    waveCtx.fillRect(0, 0, w, h);
+
+    let peak = 0;
+    let sumSq = 0;
+    for (let i = 0; i < timeData.length; i++) {
+      const v = (timeData[i] - 128) / 128;
+      const absV = Math.abs(v);
+      if (absV > peak) peak = absV;
+      sumSq += v * v;
+    }
+    const rms = Math.sqrt(sumSq / timeData.length);
+    const speakingNow = rms > 0.018 || peak > 0.06;
+
+    const nowMs = performance.now();
+
+    if (speakingNow) {
+      hasSpokenOnce = true;
+      lastSpeechMs = nowMs;
+      livePill.innerHTML = '<span class="dot"></span>SPEAKING';
+    } else if (hasSpokenOnce) {
+      const silenceSec = (nowMs - lastSpeechMs) / 1000;
+      const limitSec = parseFloat(silenceSlider.value);
+      const rem = Math.max(0, limitSec - silenceSec);
+      livePill.innerHTML = `<span class="dot"></span>AUTO-STOP ${rem.toFixed(1)}s`;
+
+      if (silenceSec >= limitSec) {
+        stopLiveMic('Finished talking — auto-playing synced preview...', true);
+        return;
+      }
+    } else {
+      livePill.innerHTML = '<span class="dot"></span>WAITING FOR VOICE';
+    }
+
+    const bars = 36;
+    const gap = 3;
+    const barW = (w - gap * (bars - 1)) / bars;
+    const samplesPerBar = Math.max(1, Math.floor(timeData.length / bars));
+    const ampBoost = Math.min(4.5, Math.max(1.4, peak * 4.2));
+
+    for (let i = 0; i < bars; i++) {
+      let localMax = 0;
+      const startSample = i * samplesPerBar;
+      for (let j = 0; j < samplesPerBar && startSample + j < timeData.length; j++) {
+        const amp = Math.abs((timeData[startSample + j] - 128) / 128);
+        if (amp > localMax) localMax = amp;
+      }
+      const scaled = Math.min(1, localMax * ampBoost);
+      const barH = Math.max(4, scaled * (h - 10));
+      const x = i * (barW + gap);
+      waveCtx.fillStyle = speakingNow ? '#22c55e' : '#3b82f6';
+      waveCtx.fillRect(x, (h - barH) / 2, barW, barH);
+    }
+
+    waveAnimId = requestAnimationFrame(renderWaveformAndSilence);
+  }
+
+  function drawCaptionGroup(group, activeIndexInGroup, popElapsedSec) {
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.fillStyle = bgColor.value;
+    ctx.fillRect(0, 0, W, H);
+
+    if (!group || !group.length) return;
+
+    const popDur = 0.085;
+    const scale = (popElapsedSec !== null && popElapsedSec >= 0 && popElapsedSec < popDur)
+      ? 1 + 0.16 * Math.sin((popElapsedSec / popDur) * Math.PI)
+      : 1;
+
+    const size = parseInt(fontSizeInput.value, 10);
+    const strokeW = parseInt(strokeWidthInput.value, 10);
+
+    ctx.save();
+    ctx.translate(W / 2, H / 2);
+    ctx.scale(scale, scale);
+    ctx.font = `900 ${size}px "${fontSelect.value}", Impact, sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+
+    const gap = size * 0.32;
+    const widths = group.map(w => ctx.measureText(w).width);
+    const totalW = widths.reduce((a, b) => a + b, 0) + gap * (group.length - 1);
+    let x = -totalW / 2;
+
+    group.forEach((word, i) => {
+      const isActive = i === activeIndexInGroup;
+
+      ctx.save();
+      ctx.fillStyle = '#000000';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = strokeW;
+      ctx.strokeText(word, x + 6, 8);
+      ctx.fillText(word, x + 6, 8);
+      ctx.restore();
+
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = strokeW;
+      ctx.strokeText(word, x, 0);
+
+      ctx.fillStyle = isActive ? activeColor.value : '#FFFFFF';
+      ctx.fillText(word, x, 0);
+
+      x += widths[i] + gap;
+    });
+
+    ctx.restore();
+  }
+
+  function wordWeight(w) {
+    const clean = w.replace(/[^a-zA-Z0-9']/g, '');
+    return Math.max(2, clean.length);
+  }
+
+  function extractVoicedWindows(buffer, wordsCount) {
+    if (!buffer || !wordsCount) return null;
+    const channel = buffer.getChannelData(0);
+    const sr = buffer.sampleRate;
+    const winSamples = Math.max(1, Math.floor(sr * 0.025));
+    const frames = [];
+
+    let maxRms = 0;
+    for (let i = 0; i < channel.length; i += winSamples) {
+      let sumSq = 0;
+      const end = Math.min(channel.length, i + winSamples);
+      for (let j = i; j < end; j++) {
+        sumSq += channel[j] * channel[j];
+      }
+      const rms = Math.sqrt(sumSq / Math.max(1, end - i));
+      if (rms > maxRms) maxRms = rms;
+      frames.push({ time: i / sr, rms });
+    }
+
+    if (!frames.length || maxRms < 0.004) return null;
+
+    const threshold = Math.max(0.012, maxRms * 0.14);
+    const voicedFrames = frames.filter(f => f.rms >= threshold);
+    if (!voicedFrames.length) return null;
+
+    const regions = [];
+    let regStart = voicedFrames[0].time;
+    let regEnd = voicedFrames[0].time + 0.025;
+
+    for (let k = 1; k < voicedFrames.length; k++) {
+      const f = voicedFrames[k];
+      if (f.time - regEnd <= 0.16) {
+        regEnd = f.time + 0.025;
+      } else {
+        if (regEnd - regStart >= 0.06) {
+          regions.push({ start: regStart, end: regEnd });
+        }
+        regStart = f.time;
+        regEnd = f.time + 0.025;
+      }
+    }
+    if (regEnd - regStart >= 0.06) {
+      regions.push({ start: regStart, end: regEnd });
+    }
+
+    return regions.length ? regions : null;
+  }
+
+  function mapWordsToRegions(wordsArr, regions, fallbackDuration) {
+    if (!wordsArr.length) return [];
+
+    if (!regions || !regions.length) {
+      const span = Math.max(wordsArr.length * 0.18, fallbackDuration);
+      const weights = wordsArr.map(wordWeight);
+      const totalW = weights.reduce((a, b) => a + b, 0);
+      let cursor = 0;
+      return wordsArr.map((w, i) => {
+        const dur = (weights[i] / totalW) * span;
+        const item = { word: w.toUpperCase(), start: cursor, end: cursor + dur, popStart: cursor };
+        cursor += dur;
+        return item;
+      });
+    }
+
+    const totalVoicedSec = regions.reduce((sum, r) => sum + Math.max(0.05, r.end - r.start), 0);
+    const weights = wordsArr.map(wordWeight);
+    const totalW = weights.reduce((a, b) => a + b, 0);
+    const wordDurs = weights.map(wt => (wt / totalW) * totalVoicedSec);
+
+    const result = [];
+    let regIdx = 0;
+    let regCursor = regions[0].start;
+
+    for (let i = 0; i < wordsArr.length; i++) {
+      let needed = Math.max(0.08, wordDurs[i]);
+      const startSec = regCursor;
+
+      while (needed > 0 && regIdx < regions.length) {
+        const reg = regions[regIdx];
+        if (regCursor < reg.start) regCursor = reg.start;
+        const avail = reg.end - regCursor;
+        if (avail >= needed) {
+          regCursor += needed;
+          needed = 0;
+        } else {
+          needed -= Math.max(0, avail);
+          regIdx++;
+          regCursor = regIdx < regions.length ? regions[regIdx].start : reg.end;
+        }
+      }
+
+      const endSec = Math.max(startSec + 0.08, regCursor);
+      result.push({
+        word: wordsArr[i].toUpperCase(),
+        start: startSec,
+        end: endSec,
+        popStart: startSec
+      });
+    }
+
+    return result;
+  }
+
+  function buildWaveformSyncedTimeline() {
+    const textWords = wordsBox.value.trim().split(/\s+/).filter(Boolean);
+    if (!textWords.length) {
+      syncedWords = [];
+      return [];
+    }
+
+    if ((currentMode === 'mic' || currentMode === 'upload') && decodedAudioBuffer) {
+      const regions = extractVoicedWindows(decodedAudioBuffer, textWords.length);
+      syncedWords = mapWordsToRegions(textWords, regions, decodedAudioBuffer.duration);
+      return syncedWords;
+    }
+
+    if ((currentMode === 'mic' || currentMode === 'upload') && audioDurationSec > 0) {
+      syncedWords = mapWordsToRegions(textWords, null, audioDurationSec);
+      return syncedWords;
+    }
+
+    const wps = parseFloat(speedSlider.value);
+    const step = 1 / wps;
+    syncedWords = textWords.map((w, i) => ({
+      word: w.toUpperCase(),
+      start: i * step,
+      end: (i + 1) * step,
+      popStart: i * step
+    }));
+    return syncedWords;
+  }
+
+  // Gate live intro words until actual voice has started speaking
+  function renderLiveFrame() {
+    if (!isRecording) return;
+    if (!hasSpokenOnce) {
+      drawCaptionGroup([], -1, null);
+      liveAnimId = requestAnimationFrame(renderLiveFrame);
+      return;
+    }
+
+    const gSize = parseInt(groupSizeSelect.value, 10);
+    const finalWords = finalizedText ? finalizedText.split(/\s+/).filter(Boolean) : [];
+    const allWords = [
+      ...finalWords.map(w => w.toUpperCase()),
+      ...currentInterimWords.map(w => w.toUpperCase())
+    ];
+
+    if (allWords.length > 0) {
+      const activeIdx = allWords.length - 1;
+      const gStart = Math.floor(activeIdx / gSize) * gSize;
+      const slice = allWords.slice(gStart, gStart + gSize);
+      drawCaptionGroup(slice, activeIdx - gStart, 0.02);
+    } else {
+      drawCaptionGroup([], -1, null);
+    }
+
+    liveAnimId = requestAnimationFrame(renderLiveFrame);
+  }
+
+  async function startLiveMic() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      statusText.textContent = 'SpeechRecognition is not supported in this browser. Use Chrome or Edge.';
+      return;
+    }
+
+    let stream;
+    try {
+      stream = await ensurePersistentMic();
+    } catch (_) {
+      statusText.textContent = 'Microphone permission denied.';
+      return;
+    }
+
+    stopPlayback();
+    micChunks = [];
+    syncedWords = [];
+    decodedAudioBuffer = null;
+    audioDurationSec = 0;
+    finalizedText = '';
+    currentInterimWords = [];
+    wordsBox.value = '';
+    hasSpokenOnce = false;
+    autoPlayOnRecordStop = true;
+
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : 'audio/webm';
+    micMediaRecorder = new MediaRecorder(stream, { mimeType });
+    micMediaRecorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) micChunks.push(e.data);
+    };
+    micMediaRecorder.onstop = async () => {
+      const shouldPlay = autoPlayOnRecordStop;
+      autoPlayOnRecordStop = false;
+      const blob = new Blob(micChunks, { type: micMediaRecorder.mimeType || 'audio/webm' });
+      await processRecordedOrUploadedBlob(blob, shouldPlay);
+    };
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      lastSpeechMs = performance.now();
+
+      let interimStr = '';
+      let finalChunk = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const res = event.results[i];
+        const t = res[0].transcript.trim();
+        if (!t) continue;
+        if (res.isFinal) finalChunk += (finalChunk ? ' ' : '') + t;
+        else interimStr += (interimStr ? ' ' : '') + t;
+      }
+
+      if (finalChunk) {
+        finalizedText = (finalizedText + ' ' + finalChunk).trim();
+        currentInterimWords = [];
+      }
+
+      currentInterimWords = interimStr ? interimStr.split(/\s+/).filter(Boolean) : [];
+      wordsBox.value = (finalizedText + ' ' + interimStr).trim();
+    };
+
+    sessionStartMs = performance.now();
+    lastSpeechMs = sessionStartMs;
+    isRecording = true;
+
+    micBtn.textContent = '⏹️ Stop Talking';
+    micBtn.classList.remove('primary');
+    micBtn.classList.add('recording');
+    livePill.classList.add('active');
+    livePill.innerHTML = '<span class="dot"></span>WAITING FOR VOICE';
+    statusText.textContent = '🎙️ Ready — start speaking and captions will appear right on cue.';
+
+    micMediaRecorder.start(250);
+    recognition.start();
+    waveAnimId = requestAnimationFrame(renderWaveformAndSilence);
+    liveAnimId = requestAnimationFrame(renderLiveFrame);
+  }
+
+  function stopLiveMic(msg = 'Stopping and syncing to your voice waveform...', shouldAutoPlay = true) {
+    if (!isRecording) return;
+    isRecording = false;
+    autoPlayOnRecordStop = shouldAutoPlay;
+    cancelAnimationFrame(waveAnimId);
+    cancelAnimationFrame(liveAnimId);
+
+    if (currentInterimWords.length > 0) {
+      finalizedText = (finalizedText + ' ' + currentInterimWords.join(' ')).trim();
+      wordsBox.value = finalizedText;
+      currentInterimWords = [];
+    }
+
+    if (recognition) {
+      try { recognition.stop(); } catch (_) {}
+      recognition = null;
+    }
+    if (micMediaRecorder && micMediaRecorder.state !== 'inactive') {
+      micMediaRecorder.stop();
+    }
+
+    micBtn.textContent = '🎙️ Start Talking';
+    micBtn.classList.remove('recording');
+    micBtn.classList.add('primary');
+    livePill.classList.remove('active');
+    livePill.innerHTML = '<span class="dot"></span>IDLE';
+    drawIdleWave();
+    drawCaptionGroup([], -1, null);
+    statusText.textContent = msg;
+  }
+
+  micBtn.addEventListener('click', () => {
+    if (!isRecording) startLiveMic();
+    else stopLiveMic('Stopped — syncing to your voice waveform...', true);
+  });
+
+  fileInput.addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    await processRecordedOrUploadedBlob(f, true);
+  });
+
+  syncUploadBtn.addEventListener('click', async () => {
+    buildWaveformSyncedTimeline();
+    await playSynced({ autoTriggered: true });
+  });
+
+  wordsBox.addEventListener('change', async () => {
+    if (!isRecording && wordsBox.value.trim()) {
+      buildWaveformSyncedTimeline();
+      await playSynced({ autoTriggered: true });
+    }
+  });
+
+  // Gate playback/export words until audio reaches the first word's voiced start time
+  function renderAtSec(sec, timeline) {
+    if (!timeline || !timeline.length) {
+      drawCaptionGroup([], -1, null);
+      return;
+    }
+    if (sec < timeline[0].start) {
+      drawCaptionGroup([], -1, null);
+      return;
+    }
+    const gSize = parseInt(groupSizeSelect.value, 10);
+    let idx = timeline.findIndex(item => sec >= item.start && sec <= item.end + 0.02);
+    if (idx === -1) {
+      idx = timeline.length - 1;
+    }
+    const gStart = Math.floor(idx / gSize) * gSize;
+    const slice = timeline.slice(gStart, gStart + gSize);
+    const popElapsed = Math.max(0, sec - timeline[idx].popStart);
+    drawCaptionGroup(slice.map(s => s.word), idx - gStart, popElapsed);
+  }
+
+  function stopPlayback() {
+    isPlaying = false;
+    cancelAnimationFrame(playbackAnimId);
+    if (activeBufferSource) {
+      try { activeBufferSource.stop(); } catch (_) {}
+      activeBufferSource.disconnect();
+      activeBufferSource = null;
+    }
+    suppressAudioPlayEvent = true;
+    if (audioEl.src) {
+      audioEl.pause();
+      audioEl.currentTime = 0;
+    }
+    setTimeout(() => { suppressAudioPlayEvent = false; }, 100);
+    drawCaptionGroup([], -1, null);
+  }
+
+  async function playSynced({ exportDest = null, onComplete = null, autoTriggered = false } = {}) {
+    stopPlayback();
+
+    const timeline = buildWaveformSyncedTimeline();
+    if (!timeline.length) {
+      if (!autoTriggered) statusText.textContent = 'Add words or record with your mic first.';
+      return;
+    }
+
+    const totalDur = decodedAudioBuffer
+      ? decodedAudioBuffer.duration
+      : (audioDurationSec > 0 ? audioDurationSec : timeline[timeline.length - 1].end);
+
+    return new Promise(async (resolve) => {
+      isPlaying = true;
+      statusText.textContent = exportDest
+        ? '🎬 Recording video + audio...'
+        : '▶️ Playing waveform-synced preview...';
+
+      let startAudioTime = null;
+      const fallbackStartMs = performance.now();
+      let useBufferAudio = false;
+
+      if (decodedAudioBuffer) {
+        const actx = await ensureAudioCtx();
+        const src = actx.createBufferSource();
+        src.buffer = decodedAudioBuffer;
+        src.connect(actx.destination);
+        if (exportDest) {
+          src.connect(exportDest);
+        }
+        startAudioTime = actx.currentTime;
+        src.start(0);
+        activeBufferSource = src;
+        useBufferAudio = true;
+      } else if (audioEl.src) {
+        suppressAudioPlayEvent = true;
+        audioEl.currentTime = 0;
+        await audioEl.play().catch(() => {});
+        setTimeout(() => { suppressAudioPlayEvent = false; }, 100);
+      }
+
+      function finish() {
+        if (!isPlaying) return;
+        isPlaying = false;
+        cancelAnimationFrame(playbackAnimId);
+        if (activeBufferSource) {
+          try { activeBufferSource.stop(); } catch (_) {}
+          activeBufferSource.disconnect();
+          activeBufferSource = null;
+        }
+        suppressAudioPlayEvent = true;
+        if (audioEl.src) {
+          audioEl.pause();
+          audioEl.currentTime = 0;
+        }
+        setTimeout(() => { suppressAudioPlayEvent = false; }, 100);
+        drawCaptionGroup([], -1, null);
+        statusText.textContent = 'Preview finished. Click Download Video + Audio to export.';
+        if (onComplete) onComplete();
+        resolve();
+      }
+
+      async function tick(now) {
+        if (!isPlaying) return;
+        let sec;
+        if (useBufferAudio && startAudioTime !== null) {
+          const actx = await ensureAudioCtx();
+          sec = actx.currentTime - startAudioTime;
+        } else if (audioEl.src && !audioEl.paused) {
+          sec = audioEl.currentTime;
+        } else {
+          sec = (now - fallbackStartMs) / 1000;
+        }
+
+        renderAtSec(sec, timeline);
+
+        if (sec < totalDur + 0.05) {
+          playbackAnimId = requestAnimationFrame(tick);
+        } else {
+          finish();
+        }
+      }
+
+      playbackAnimId = requestAnimationFrame(tick);
+    });
+  }
+
+  audioEl.addEventListener('play', async () => {
+    if (!suppressAudioPlayEvent && !isPlaying && !isRecording) {
+      await playSynced({ autoTriggered: true });
+    }
+  });
+
+  document.getElementById('stopBtn').addEventListener('click', () => {
+    stopPlayback();
+    statusText.textContent = 'Stopped preview.';
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', async () => {
+    const timeline = buildWaveformSyncedTimeline();
+    if (!timeline.length) return;
+
+    const btn = document.getElementById('exportBtn');
+    btn.disabled = true;
+
+    const stream = canvas.captureStream(60);
+    let exportDest = null;
+
+    if (decodedAudioBuffer) {
+      const actx = await ensureAudioCtx();
+      exportDest = actx.createMediaStreamDestination();
+      exportDest.stream.getAudioTracks().forEach(track => stream.addTrack(track));
+    }
+
+    const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2')
+      ? 'video/mp4;codecs=avc1,mp4a.40.2'
+      : (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+          ? 'video/webm;codecs=vp9,opus'
+          : 'video/webm');
+    const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+
+    const recorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 8_000_000,
+      audioBitsPerSecond: 192_000
+    });
+    const chunks = [];
+
+    recorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kinetic-captions-with-voice.${ext}`;
+      a.click();
+      statusText.textContent = `✅ Downloaded kinetic-captions-with-voice.${ext} with audio included!`;
+      btn.disabled = false;
+    };
+
+    recorder.start(100);
+    await playSynced({
+      exportDest,
+      onComplete: () => {
+        setTimeout(() => {
+          if (recorder.state !== 'inactive') recorder.stop();
+        }, 150);
+      }
+    });
+  });
+
+  aspectSelect.addEventListener('change', () => {
+    const [w, h] = aspectSelect.value.split('x').map(Number);
+    canvas.width = w;
+    canvas.height = h;
+    drawCaptionGroup([], -1, null);
+  });
+
+  drawIdleWave();
+  drawCaptionGroup([], -1, null);
+</script>
+</body>
+</html>
