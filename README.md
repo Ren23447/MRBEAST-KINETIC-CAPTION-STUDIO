@@ -2,11 +2,17 @@
 
 Created by **Ren** to give users and new content creators free, high-quality assets for their videos.
 
+**[🚀 Open Live Site](https://ren23447.github.io/MRBEAST-KINETIC-CAPTION-STUDIO/)**
+
 ![Kinetic Caption Studio Preview](https://raw.githubusercontent.com/Ren23447/MRBEAST-KINETIC-CAPTION-STUDIO/main/Screenshot%202026-11-20%20222658.png)
 
 ## Overview
 
 **Kinetic Caption Studio** is a single-file browser tool for generating bold, high-contrast kinetic captions with pop animations, active-word color highlights, and video + audio export.
+
+## Live Demo
+
+Try it directly in your browser with no installation required: **[https://ren23447.github.io/MRBEAST-KINETIC-CAPTION-STUDIO/](https://ren23447.github.io/MRBEAST-KINETIC-CAPTION-STUDIO/)**
 
 ## Modes & Features
 
@@ -17,7 +23,7 @@ Created by **Ren** to give users and new content creators free, high-quality ass
 
 ## How to Use
 
-1. Open the HTML studio file in a modern browser (Chrome or Edge recommended for live speech recognition).
+1. Open the **[Live Site](https://ren23447.github.io/MRBEAST-KINETIC-CAPTION-STUDIO/)** (or open the HTML studio file locally) in a modern browser (Chrome or Edge recommended for live speech recognition).
 2. Choose one of the three modes on the start menu: **Live Mic & Voice Sync**, **Upload MP3 / MP4 Audio**, or **Text-Only Test**.
 3. Customize your words, group size (`1`, `2`, or `3` words), font, colors, sizing, and aspect ratio (`1920x1080` or `1080x1920`).
 4. Preview your captions and click **Download Video + Audio** to save your clip.
